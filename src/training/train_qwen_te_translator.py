@@ -106,7 +106,7 @@ if __name__ == "__main__":
         learning_rate=LEARNING_RATE,
         logging_steps=50,
         save_steps=1000,
-        evaluation_strategy="steps",
+        eval_strategy="steps",
         eval_steps=500,
         save_total_limit=3,
         gradient_checkpointing=True,
