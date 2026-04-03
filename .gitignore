@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+.venv/
+
+hf_data/
+outputs/
+
+.pytest_cache/
+.mypy_cache/
+
+.ipynb_checkpoints/
