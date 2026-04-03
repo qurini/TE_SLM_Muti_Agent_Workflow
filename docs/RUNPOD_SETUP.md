@@ -71,6 +71,14 @@ This first run is only meant to validate:
 - memory fit on your selected GPU
 - the model can start learning the TE format
 
+If generations look poor but training metrics look artificially strong, rebuild with the compact
+training-time system prompt and rerun with a larger context window, for example:
+
+```bash
+python src/data/build_hf_dataset.py
+MAX_SEQ_LENGTH=3072 TRAIN_BATCH_SIZE=1 EVAL_BATCH_SIZE=1 GRAD_ACCUM=8 python src/training/train_qwen_te_translator.py
+```
+
 ## 7. What to check after the run
 
 - Training loss decreases.
