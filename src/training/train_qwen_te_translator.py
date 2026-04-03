@@ -6,10 +6,9 @@ from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
     BitsAndBytesConfig,
-    TrainingArguments,
 )
 from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
-from trl import SFTTrainer
+from trl import SFTConfig, SFTTrainer
 
 MODEL_NAME = os.getenv("MODEL_NAME", "Qwen/Qwen2.5-0.5B-Instruct")
 DATASET_PATH = os.getenv("DATASET_PATH", "hf_data/telegraph_ft_nl2te")
@@ -97,7 +96,7 @@ if __name__ == "__main__":
     model.print_trainable_parameters()
 
     # 4. Training arguments
-    training_args = TrainingArguments(
+    training_args = SFTConfig(
         output_dir=OUTPUT_DIR,
         per_device_train_batch_size=TRAIN_BATCH_SIZE,
         per_device_eval_batch_size=EVAL_BATCH_SIZE,
@@ -114,17 +113,17 @@ if __name__ == "__main__":
         bf16=True,
         remove_unused_columns=False,
         report_to="none",
+        max_length=MAX_SEQ_LENGTH,
+        packing=False,
     )
 
     # 5. SFT Trainer
     trainer = SFTTrainer(
         model=model,
-        tokenizer=tokenizer,
+        processing_class=tokenizer,
         train_dataset=dataset["train"],
         eval_dataset=dataset["validation"],
         formatting_func=formatting_func,
-        max_seq_length=MAX_SEQ_LENGTH,
-        packing=False,
         args=training_args,
     )
 
