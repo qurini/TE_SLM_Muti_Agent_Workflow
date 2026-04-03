@@ -3,7 +3,8 @@ import os
 from pathlib import Path
 import importlib.metadata
 
-from transformers import AutoTokenizer, AutoModelForCausalLM
+import torch
+from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 
 DATA_PATH = Path("trainingdata/compressed_output/telegraph-ft/full_train.jsonl")
 MODEL_NAME = os.getenv("MODEL_NAME", "Qwen/Qwen2.5-0.5B-Instruct")
@@ -52,10 +53,17 @@ def main():
         print("bitsandbytes detected: trying 4-bit model load.")
         load_kwargs.update({
             "device_map": "auto",
-            "load_in_4bit": True,
+            "torch_dtype": torch.bfloat16,
+            "quantization_config": BitsAndBytesConfig(
+                load_in_4bit=True,
+                bnb_4bit_quant_type="nf4",
+                bnb_4bit_compute_dtype=torch.bfloat16,
+                bnb_4bit_use_double_quant=True,
+            ),
         })
     else:
         print("bitsandbytes not found: falling back to non-quantized model load.")
+        load_kwargs["torch_dtype"] = torch.bfloat16
 
     try:
         model = AutoModelForCausalLM.from_pretrained(
